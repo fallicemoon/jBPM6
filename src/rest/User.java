@@ -108,7 +108,6 @@ public class User {
 		String user = "";
 		String password = "";
 		List<String> roles = new ArrayList<String>(); 
-		JSONObject response = new JSONObject();
 		
 		try {
 			JSONObject json = new JSONObject(jsonString);
