@@ -15,7 +15,7 @@ import utility.RemoteRest;
 @Path("/login")
 public class Rest {
 	protected Logger logger = Logger.getLogger(this.getClass());
-	protected RemoteRest remoteRest = new RemoteRest();
+	
 
 	public Rest() {
 		

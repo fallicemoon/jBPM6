@@ -31,7 +31,7 @@ public class UserRest extends Rest{
 	static int ROLES_PROPERTIES_PATH = 1;
 
 	public UserRest() {
-		this("/home/el43/jbpm-installer/jboss-as-7.1.1.Final/standalone/configuration/users.properties", "/home/el43/jbpm-installer/jboss-as-7.1.1.Final/standalone/configuration/roles.properties");
+		this("/home/el43/jbpm-installer/wildfly-8.1.0.Final/standalone/configuration/users.properties", "/home/el43/jbpm-installer/wildfly-8.1.0.Final/standalone/configuration/roles.properties");
 	}
 	
 	public UserRest(String usersPropertiesPath, String rolesPropertiesPath) {

@@ -1,42 +1,56 @@
 package utility;
 
-import java.io.BufferedWriter;
-import java.io.File;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+
+import java.sql.*;
+
+
+
 
 
 public class MySQLConnector {
+	Connection con;
+	PreparedStatement workItemIdPS;
 
-	public MySQLConnector() {
-		
+	public MySQLConnector() throws ClassNotFoundException, SQLException {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://10.16.140.105:3306/jbpm", "root", "qwerty");
+			workItemIdPS = con.prepareStatement("SELECT id, workItemId, processInstanceId FROM `Task` WHERE `formName`=? and status=?");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+	
+	
 
-	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection con = DriverManager.getConnection("jdbc:mysql://10.16.140.105:3306/jbpm", "root", "qwerty");
-		
-		Statement statement = con.createStatement();
-		ResultSet rs = statement.executeQuery("SELECT * FROM `ProcessInstanceInfo` WHERE `InstanceId`=128");
-		
-
+	public int getAllWorkItemId(String formName) throws SQLException, IOException {
+		workItemIdPS = con.prepareStatement("SELECT workItemId FROM `Task` WHERE `formName`=?");
+		workItemIdPS.setString(1, formName);
+		return workItemIdPS.executeQuery().getInt("workItemId");
+	}
+	
+	public int getReadyWorkItemId(String formName) throws SQLException, IOException {
+		workItemIdPS.setString(1, formName);
+		workItemIdPS.setString(2, "Ready");
+		return workItemIdPS.executeQuery().getInt("workItemId");
+	}
+	
+	public int getInProgressWorkItemId(String formName) throws SQLException, IOException {
+		workItemIdPS.setString(1, formName);
+		workItemIdPS.setString(2, "Progress");
+		return workItemIdPS.executeQuery().getInt("workItemId");
+	}
+	
+	public int getCompleteWorkItemId(String formName) throws SQLException, IOException {
+		workItemIdPS.setString(1, formName);
+		workItemIdPS.setString(2, "Complete");
+		return workItemIdPS.executeQuery().getInt("workItemId");
 	}
 
 }
