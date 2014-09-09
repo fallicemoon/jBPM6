@@ -54,7 +54,7 @@ public class ProcessRest extends Rest{
 	}
 	
 	@GET
-	public String getLeaveList(String jsonString){
+	public String getTaskOfLeaveList(String jsonString){
 		RemoteRest remoteRest = new RemoteRest();
 		String taskName;
 		
@@ -78,7 +78,27 @@ public class ProcessRest extends Rest{
 		try {
 			JSONObject json = new JSONObject(jsonString);
 			processInstanceId = json.getString("processInstanceId");
-			JSONObject responseJson = remoteRest.getTask(processInstanceId);
+			JSONObject responseJson = remoteRest.getProcessInstanceVar(processInstanceId);
+			return responseJson.toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return getFailResponseJson();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return getFailResponseJson();
+		} 
+		
+	}
+	
+	@GET
+	public String getLeaveTask(String jsonString){
+		RemoteRest remoteRest = new RemoteRest();
+		String processInstanceId;
+		
+		try {
+			JSONObject json = new JSONObject(jsonString);
+			processInstanceId = json.getString("processInstanceId");
+			JSONObject responseJson = remoteRest.getProcessInstanceVar(processInstanceId);
 			return responseJson.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();

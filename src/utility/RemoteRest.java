@@ -123,11 +123,11 @@ public class RemoteRest {
 //		return responseJson.toString();
 //	}
 //	
-//	public JSONObject getParameters(String workItemId) throws JSONException, IOException {
-//		String url = String.format("%s/runtime/com.henry:henry_project:1.0/workitem/27",baseURL);
-//		JSONObject json = new JSONObject(connect(url, "GET").readLine());
-//		return json.getJSONObject("parameters");
-//	}
+	public JSONObject getTaskVar(String workItemId) throws JSONException, IOException {
+		String url = String.format("%s/runtime/com.henry:henry_project:1.0/workitem/%s", baseURL, workItemId);
+		JSONObject json = new JSONObject(connect(url, "GET").readLine());
+		return json.getJSONObject("param-map");
+	}
 	
 	//-----------------------------------------get tasks
 	public JSONObject getAllTasks() throws JSONException {
@@ -201,7 +201,7 @@ public class RemoteRest {
 		return responseJson;
 	}
 
-	public JSONObject getTask(String processInstanceId) throws JSONException, IOException {
+	public JSONObject getProcessInstanceVar(String processInstanceId) throws JSONException, IOException {
 		String url = String.format("%s/history/instance/%s/variable", baseURL, processInstanceId);
 		JSONArray historyLogList = new JSONObject(connect(url, "GET").readLine()).getJSONArray("historyLogList");
 		
@@ -225,7 +225,8 @@ public class RemoteRest {
 		//int i = remoteRest.createProcessInstance("com.henry:henry_project:1.0", "henry_project.leave_request", map);
 		//String string = remoteRest.getProcessInstances("com.henry:henry_project:1.0","henry_project.teststatus");
 		//String i = remoteRest.startTask("31");
-		JSONObject jsonObject = remoteRest.getTask("21");
+		//JSONObject jsonObject = remoteRest.getTask("21");
+		JSONObject jsonObject = remoteRest.getTaskVar("7");
 		System.out.println(jsonObject);
 
 		
