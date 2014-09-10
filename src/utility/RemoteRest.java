@@ -1,6 +1,5 @@
 package utility;
 
-import java.awt.Stroke;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -341,7 +340,8 @@ public class RemoteRest {
 		//9.get var
 		//JSONObject json = remoteRest.getProcessInstanceVar(processInstanceId);
 		
-		System.out.println(json);
+		
+		//System.out.println(json);
 		
 		
 	}
