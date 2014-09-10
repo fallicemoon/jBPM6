@@ -1,11 +1,13 @@
 package utility;
 
+import java.awt.Stroke;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,6 +15,9 @@ import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.enterprise.inject.New;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 
 import org.apache.commons.codec.binary.Base64;
@@ -84,49 +89,82 @@ public class RemoteRest {
 
 
 	//----------
-	public int createProcessInstance(String deploymentId, String processDefId, Map<String, String> map) throws JSONException, IOException {
-		String query = map.toString().replaceAll(", ", "&").replaceAll("[{}]", "");
+	public String createProcessInstance(String deploymentId, String processDefId, Map<String, String> map) throws JSONException, IOException, ScriptException {
+		String queryString = map.toString().replaceAll(", ", "&").replaceAll("[{}]", "");
+
+        ScriptEngineManager factory = new ScriptEngineManager();
+        ScriptEngine engine = factory.getEngineByName("JavaScript");
+        String query = (String)engine.eval("encodeURI('"+queryString+"')");
+
 		String url = String.format("%s/runtime/%s/process/%s/start?%s", baseURL, deploymentId, processDefId, query);
 		BufferedReader reader = connect(url, "POST");
 		JSONObject json = new JSONObject(reader.readLine().toString());
-		return json.getInt("id");
+		return String.valueOf(json.getInt("id"));
 	}
 	
-	public String startTask(String taskId) throws IOException {
+	public JSONObject startTask(String taskId) throws IOException, JSONException {
 		String url = String.format("%s/task/%s/start", baseURL, taskId);
-		return connect(url, "POST").readLine();
+		return new JSONObject(connect(url, "POST").readLine());
 	}
 	
-	public String completeTask(String taskId, Map<String, String> map) throws IOException {
+	public JSONObject completeTask(String taskId, Map<String, String> map) throws IOException, JSONException {
 		String query = map.toString().replaceAll(", ", "&").replaceAll("[{}]", "");
 		String url = String.format("%s/task/%s/complete?%s", baseURL, taskId, query);
-		return connect(url, "POST").readLine();
+		return new JSONObject(connect(url, "POST").readLine());
 	}
 	
 	
-	//-----------not use
-//	public String getProcessInstances(String deploymentId, String processId) throws IOException, JSONException {
-//		String url = String.format("%s/runtime/%s/history/instances", baseURL, deploymentId);
-//		String jsonString = connect(url, "GET").readLine();
-//
-//		JSONObject json = new JSONObject(jsonString);
-//		JSONObject responseJson = new JSONObject();
-//		
-//		JSONArray historyLogList = json.getJSONArray("historyLogList");
-//		for(int i=0; i<historyLogList.length(); i++){
-//			JSONObject object = historyLogList.getJSONObject(i);
-//			if(object.getString("processId").equals(processId)){
-//				responseJson.put(String.valueOf(object.getInt("processInstanceId")), object.remove("result"));
-//			}
-//		}
-//		
-//		return responseJson.toString();
-//	}
-//	
-	public JSONObject getTaskVar(String workItemId) throws JSONException, IOException {
+	//-----------
+	public JSONObject getTaskIdByProcessInstanceId(String deploymentId, String processInstanceId) throws IOException, JSONException {
+		JSONObject json = getAllTasks();
+		JSONObject responseJson = new JSONObject();
+		
+		for(int i=1; i<=json.length(); i++){
+			JSONObject object = json.getJSONObject(String.valueOf(i));
+			String procInstId = String.valueOf(object.getInt("process-instance-id"));
+			
+			if(procInstId.equals(processInstanceId))
+				responseJson.put(procInstId,String.valueOf(object.getInt("id")));
+		}
+		
+		return responseJson;
+	}
+	
+	public JSONObject getTaskByProcessInstanceId(String processInstanceId) throws JSONException, IOException {
+		JSONObject json = getAllTasks();
+		JSONObject responseJson = new JSONObject();
+		
+		for (int i = 1; i <= json.length(); i++) {
+			String index = String.valueOf(i);
+			if (!String.valueOf(json.getJSONObject(index).getInt("process-instance-id")).equals(processInstanceId))
+				continue;
+	
+			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+		}
+		
+		return responseJson;
+	}
+	
+	public JSONObject getTask(String workItemId) throws JSONException, IOException {
 		String url = String.format("%s/runtime/com.henry:henry_project:1.0/workitem/%s", baseURL, workItemId);
 		JSONObject json = new JSONObject(connect(url, "GET").readLine());
 		return json.getJSONObject("param-map");
+	}
+	
+	public JSONObject getProcessInstanceByCreator(String creator) throws JSONException, IOException {
+		String url = String.format("%s/history/instances", baseURL);
+		JSONObject json = new JSONObject(connect(url, "GET").readLine());
+		JSONObject responseJson = new JSONObject();
+		
+		JSONArray historyLogList = json.getJSONArray("historyLogList");
+		
+		for (int i = 0; i < historyLogList.length(); i++) {
+			JSONObject j = historyLogList.getJSONObject(i).getJSONObject("process-instance-log");
+			if (creator.equals(j.getString("identity"))) 
+				responseJson.put(String.valueOf(j.getInt("process-instance-id")), j);
+		}
+		
+		return responseJson;
 	}
 	
 	//-----------------------------------------get tasks
@@ -153,7 +191,7 @@ public class RemoteRest {
 		return responseJson;
 	}
 	
-	public JSONObject getAllTasks(String deploymentId, String processId) throws JSONException{
+	public JSONObject getAllTasks(String deploymentId, String processDefId) throws JSONException{
 		JSONObject json = getAllTasks();
 		JSONObject responseJson = new JSONObject();
 		
@@ -162,7 +200,7 @@ public class RemoteRest {
 			if (!json.getJSONObject(index).getString("deployment-id").equals(deploymentId)){
 				continue;
 			}
-			if (!json.getJSONObject(index).getString("process-id").equals(processId)){
+			if (!json.getJSONObject(index).getString("process-id").equals(processDefId)){
 				continue;
 			}
 			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
@@ -171,7 +209,7 @@ public class RemoteRest {
 		return responseJson;
 	}
 	
-	public JSONObject getAllTasks(String deploymentId, String processId, String taskName) throws JSONException{
+	public JSONObject getAllTasksByTaskName(String deploymentId, String processDefId, String taskName) throws JSONException{
 		JSONObject json = getAllTasks();
 		JSONObject responseJson = new JSONObject();
 		
@@ -186,13 +224,13 @@ public class RemoteRest {
 		return responseJson;
 	}
 	
-	public JSONObject getAllTasks(String deploymentId, String processId, String name, String status) throws JSONException{
-		JSONObject json = getAllTasks(deploymentId, processId, name);
+	public JSONObject getAllTasksByTaskName(String deploymentId, String processDefId, String taskName, TaskStatus status) throws JSONException{
+		JSONObject json = getAllTasksByTaskName(deploymentId, processDefId, taskName);
 		JSONObject responseJson = new JSONObject();
 		
 		for (int i = 1; i <= json.length(); i++) {
 			String index = String.valueOf(i);
-			if (!json.getJSONObject(index).getString("status").equals(status))
+			if (!json.getJSONObject(index).getString("status").equals(status.toString()))
 				continue;
 	
 			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
@@ -200,6 +238,44 @@ public class RemoteRest {
 		
 		return responseJson;
 	}
+	
+	public JSONObject getAllTasksByApprover(String deploymentId, String processDefId, String approver) throws JSONException{
+		JSONObject json = getAllTasks();
+		JSONObject responseJson = new JSONObject();
+		
+		for (int i = 1; i <= json.length(); i++) {
+			String index = String.valueOf(i);
+			String actualOwner;
+			try {
+				actualOwner = json.getJSONObject(index).getString("actual-owner");
+			} catch (JSONException e) {
+				actualOwner = "";
+			}
+
+			if (!approver.equals(actualOwner))
+				continue;
+
+			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+		}
+		
+		return responseJson;
+	}
+	
+	public JSONObject getAllTasksByApprover(String deploymentId, String processDefId, String approver, TaskStatus status) throws JSONException{
+		JSONObject json = getAllTasksByTaskName(deploymentId, processDefId, approver);
+		JSONObject responseJson = new JSONObject();
+		
+		for (int i = 1; i <= json.length(); i++) {
+			String index = String.valueOf(i);
+			if (!json.getJSONObject(index).getString("status").equals(status.toString()))
+				continue;
+	
+			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+		}
+		
+		return responseJson;
+	}
+
 
 	public JSONObject getProcessInstanceVar(String processInstanceId) throws JSONException, IOException {
 		String url = String.format("%s/history/instance/%s/variable", baseURL, processInstanceId);
@@ -217,18 +293,56 @@ public class RemoteRest {
 		return responseJson;
 	}
 	
-	public static void main(String[] args) throws IOException, JSONException {
+	public static void main(String[] args) throws IOException, JSONException, ScriptException {
 		RemoteRest remoteRest = new RemoteRest();
-//		Map map = new HashMap();
-//		map.put("map_reason", "sick");
+		String deploymentId = "com.henry:henry_project:1.0";
+		String processDefId = "henry_project.leave_request";
+		
+		String taskName = "Manager approve";
+		
+		//1.user side, create process
+//		Map<String, String> map = new HashMap<String, String>();
+//		map.put("map_reason","XXXX");
 //		map.put("map_days", "3");
-		//int i = remoteRest.createProcessInstance("com.henry:henry_project:1.0", "henry_project.leave_request", map);
-		//String string = remoteRest.getProcessInstances("com.henry:henry_project:1.0","henry_project.teststatus");
-		//String i = remoteRest.startTask("31");
-		//JSONObject jsonObject = remoteRest.getTask("21");
-		JSONObject jsonObject = remoteRest.getTaskVar("7");
-		System.out.println(jsonObject);
+//		
+//		String processInstanceId = remoteRest.createProcessInstance(deploymentId, processDefId, map);
+//		JSONObject json = remoteRest.getTaskIdByProcessInstanceId(deploymentId, processInstanceId);
+		
+		//remoteRest.setUser("xxxxxx");
+		//remoteRest.startTask(json.getString(processInstanceId));
+		
+		//2.user side, get my process
+		//JSONObject json = remoteRest.getTaskByProcessInstanceId("46");
+		//JSONObject json = remoteRest.getProcessInstanceByCreator("john");
+		
+		//-------------------------------------------------------
+		
+		//3.approver side, list all (id is taskId)
+		//JSONObject json = remoteRest.getAllTasks(deploymentId, processDefId);
+		
+		//4.approver side, list task by my role(ex:Manager approve)
+		//JSONObject json = remoteRest.getAllTasksByTaskName(deploymentId, processDefId, taskName);
 
+		//5.approver side, list none approve task by my role
+		//JSONObject json = remoteRest.getAllTasksByTaskName(deploymentId, processDefId, taskName, TaskStatus.Ready.toString());
+		
+		//6.approve side, list my task by me
+		//JSONObject json = remoteRest.getAllTasksByApprover(deploymentId, processDefId, "henry");
+		
+		
+		//7.approve side, list none approve my task by me
+		//JSONObject json = remoteRest.getAllTasksByApprover(deploymentId, processDefId, taskName, TaskStatus.Completed);
+		
+		//8.approve
+//		Map<String, String> map = new HashMap<String, String>();
+//		map.put("map_isApproved", "true");
+//		JSONObject json = remoteRest.completeTask("63", map);
+		//---------------------------------------------------
+		//9.get var
+		//JSONObject json = remoteRest.getProcessInstanceVar(processInstanceId);
+		
+		System.out.println(json);
+		
 		
 	}
 

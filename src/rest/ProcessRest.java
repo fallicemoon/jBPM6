@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ejb.EJB;
+import javax.script.ScriptException;
 import javax.ws.rs.*;
 
 import org.jboss.logging.Logger;
@@ -22,7 +23,7 @@ public class ProcessRest extends Rest{
 	
 	//REST
 	@POST
-	public String createLeave(String jsonString){
+	public String createLeave(String jsonString) throws ScriptException{
 		String reason;
 		Integer days;
 
@@ -36,7 +37,7 @@ public class ProcessRest extends Rest{
 			map.put("map_days", days.toString());
 			
 			RemoteRest remoteRest = new RemoteRest();
-			Integer processInstanceId = remoteRest.createProcessInstance("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request", map);
+			String processInstanceId = remoteRest.createProcessInstance("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request", map);
 			Map<String, Object> responseMap = new HashMap<String, Object>();
 			map.put("processInstanceId", processInstanceId.toString());
 			
@@ -61,7 +62,7 @@ public class ProcessRest extends Rest{
 		try {
 			JSONObject json = new JSONObject(jsonString);
 			taskName = json.getString("taskName");
-			JSONObject responseJson = remoteRest.getAllTasks("com.henry:henry_proj:1.0", "henry_project.leave_request",taskName);
+			JSONObject responseJson = remoteRest.getAllTasksByTaskName("com.henry:henry_proj:1.0", "henry_project.leave_request",taskName);
 			return responseJson.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -120,7 +121,7 @@ public class ProcessRest extends Rest{
 		try {
 			JSONObject json = new JSONObject(jsonString);
 			taskId = json.getString("taskId");
-			JSONObject responseJson = remoteRest.getAllTasks("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request",taskId);
+			JSONObject responseJson = remoteRest.getAllTasksByTaskName("com.henry:henry_project:1.0", "henry_project.leave_request",taskId);
 			return responseJson.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
