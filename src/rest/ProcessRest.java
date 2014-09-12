@@ -141,7 +141,7 @@ public class ProcessRest extends Rest{
 			isApproved = String.valueOf(json.getBoolean("isApproved"));
 			taskId = json.getString("taskId");
 			
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("map_isApproved", isApproved);
 			remoteRest.completeTask(taskId, map);
 			
