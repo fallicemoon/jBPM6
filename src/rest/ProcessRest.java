@@ -32,7 +32,7 @@ public class ProcessRest extends Rest{
 			reason = json.getString("reason");
 			days = json.getInt("days");
 			
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("map_reason", reason);
 			map.put("map_days", days.toString());
 			

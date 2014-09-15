@@ -28,9 +28,10 @@ import org.json.JSONWriter;
 
 import com.sun.mail.imap.protocol.Status;
 
-
+/**This class is used for your custom REST service */
 public class RemoteRest {
 	
+
 	String baseURL;
 	String user;
 	String password;
@@ -91,6 +92,9 @@ public class RemoteRest {
 
 
 	//----------task life cycle
+	/**Create a new process instance 
+	 * @param map value's type is only for String or Integer
+	 */
 	public String createProcessInstance(String deploymentId, String processDefId, Map<String, Object> map) throws JSONException, IOException, ScriptException {
 		Set<String> set = map.keySet();
 		Map<String, String> queryMap = new HashMap<String, String>();
@@ -120,11 +124,28 @@ public class RemoteRest {
 		return String.valueOf(json.getInt("id"));
 	}
 	
+	/**
+	 * assign this task to user(right group for this task is necessary)
+	 * @param taskId
+	 * @return JSONObject it's jbpm return
+	 * @throws IOException
+	 * @throws JSONException
+	 */
 	public JSONObject startTask(String taskId) throws IOException, JSONException {
 		String url = String.format("%s/task/%s/start", baseURL, taskId);
 		return new JSONObject(connect(url, "POST").readLine());
 	}
 	
+	
+	/**
+	 * 
+	 * @param taskId
+	 * @param map map's key should starts with "map_" (add before key), map's value type is used only 
+	 * String or Integer 
+	 * @return JSONObject
+	 * @throws IOException
+	 * @throws JSONException
+	 */
 	public JSONObject completeTask(String taskId, Map<String, Object> map) throws IOException, JSONException {
 		Set<String> set = map.keySet();
 		Map<String, String> queryMap = new HashMap<String, String>();
@@ -155,32 +176,25 @@ public class RemoteRest {
 	public JSONObject abortProcess(String deploymentId, String processInstanceId) throws JSONException, IOException {
 		String url = String.format("%s/runtime/%s/process/instance/%s/abort", baseURL, deploymentId, processInstanceId);
 		return new JSONObject(connect(url, "POST").readLine());
-	}
-	
-	public JSONObject abortTask(String deploymentId, String taskId) throws JSONException, IOException {
-		String url = String.format("%s/runtime/%s/workitem/%s/abort", baseURL, deploymentId, taskId);
-		return new JSONObject(connect(url, "POST").readLine());
-	}
-	
+	}	
 	
 	//-----------
-	//TODO only used in init
-	public JSONObject getTaskIdByProcessInstanceId(String deploymentId, String processInstanceId) throws IOException, JSONException {
+	public JSONObject getReadyTaskIdByProcessInstanceId(String processInstanceId) throws IOException, JSONException {
 		JSONObject json = getAllTasks();
 		JSONObject responseJson = new JSONObject();
 		
 		for(int i=1; i<=json.length(); i++){
 			JSONObject object = json.getJSONObject(String.valueOf(i));
 			String procInstId = String.valueOf(object.getInt("process-instance-id"));
-			
-			if(procInstId.equals(processInstanceId))
+
+			if(procInstId.equals(processInstanceId)&&object.getString("status").equals(TaskStatus.Ready.toString()))
 				responseJson.put(procInstId,String.valueOf(object.getInt("id")));
 		}
 		
 		return responseJson;
 	}
 	
-	public JSONObject getTaskByProcessInstanceId(String processInstanceId) throws JSONException, IOException {
+	public JSONObject getTasksByProcessInstanceId(String processInstanceId) throws JSONException, IOException {
 		JSONObject json = getAllTasks();
 		JSONObject responseJson = new JSONObject();
 		
@@ -388,17 +402,19 @@ public class RemoteRest {
 //		map.put("map_isAppro", 1);
 //		
 //		String processInstanceId = remoteRest.createProcessInstance(deploymentId, processDefId, map);
-//		JSONObject json = remoteRest.getTaskIdByProcessInstanceId(deploymentId, processInstanceId);
+		JSONObject json = remoteRest.getReadyTaskIdByProcessInstanceId("103");
 		
-//		remoteRest.setUser("henry_hr");
-//		JSONObject json = remoteRest.startTask("116");
+		//remoteRest.startTask(json.getString("103"));
 		
 		//2.user side, get my process
-		//JSONObject json = remoteRest.getTaskByProcessInstanceId("46");
+		//JSONObject json = remoteRest.getTasksByProcessInstanceId("103");
 		//JSONObject json = remoteRest.getProcessInstanceByCreator("john");
 		
 		//skip
 		//remoteRest.skipTask(json.getString(processInstanceId));
+		
+		//abort
+		//JSONObject json = remoteRest.abortProcess(deploymentId, "129");
 		//-------------------------------------------------------
 		
 		//3.approver side, list all (id is taskId)
@@ -421,9 +437,9 @@ public class RemoteRest {
 //		remoteRest.setUser("henry_hr");
 //		Map<String, Object> map = new HashMap<String, Object>();
 //		map.put("map_isApprove_", 1);
-//		JSONObject json = remoteRest.completeTask("116", map);
+//		JSONObject json = remoteRest.completeTask("129", map);
 		
-		JSONObject json = remoteRest.getProcessInstanceState("94");
+		//JSONObject json = remoteRest.getProcessInstanceState("94");
 		//---------------------------------------------------
 		//9.get global var
 		//JSONObject json = remoteRest.getProcessInstanceVar(processInstanceId);
