@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ejb.EJB;
+
 import javax.script.ScriptException;
 import javax.ws.rs.*;
 
-import org.jboss.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,7 +49,7 @@ public class ProcessRest extends Rest{
 			map.put("map_reason", reason);
 			map.put("map_days", days.toString());
 			
-			String processInstanceId = taskLifeCycle.createProcessInstance("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request", map);
+			String processInstanceId = processInstance.createProcessInstance("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request", map);
 			Map<String, Object> responseMap = new HashMap<String, Object>();
 			map.put("processInstanceId", processInstanceId.toString());
 			

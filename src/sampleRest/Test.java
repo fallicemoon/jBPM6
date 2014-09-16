@@ -1,6 +1,8 @@
 package sampleRest;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.script.ScriptException;
 
@@ -29,9 +31,8 @@ public class Test {
 		Variables variables = new Variables(jbpmRestEntity);
 		
 		String deploymentId = "com.newegg.henry:henry_proj:1.0";
-		String processDefId = "henry_proj.take_off_request";
+		String processDefId = "henry_proj.leave_request";
 		
-		String taskName = "manager_approve";
 		
 		//1.user side, create process
 //		Map<String, Object> map = new HashMap<String, Object>();
@@ -39,10 +40,12 @@ public class Test {
 //		map.put("map_day", 3);
 //		map.put("map_isAppro", 1);
 //		
-//		String processInstanceId = remoteRest.createProcessInstance(deploymentId, processDefId, map);
-//		JSONObject json = remoteRest.getReadyTaskIdByProcessInstanceId("103");
-		
-		//remoteRest.startTask(json.getString("103"));
+//		String processInstanceId = processInstance.createProcessInstance(deploymentId, processDefId, map);
+//		JSONObject json = task.getReadyTaskIdByProcessInstanceId(processInstanceId);
+//		System.out.println(json);
+//		
+//		boolean success = taskLifeCycle.startTask(json.getString(processInstanceId));
+//		System.out.println(success);
 		
 		//2.user side, get my process
 		//JSONObject json = remoteRest.getTasksByProcessInstanceId("103");
@@ -72,19 +75,21 @@ public class Test {
 		//JSONObject json = remoteRest.getAllTasksByApprover(deploymentId, processDefId, taskName, TaskStatus.Completed);
 		
 		//8.approve
-//		remoteRest.setUser("henry_hr");
+		//jbpmRestEntity.setUser("henry_hr");
 //		Map<String, Object> map = new HashMap<String, Object>();
 //		map.put("map_isApprove_", 1);
-//		JSONObject json = remoteRest.completeTask("129", map);
+//		boolean success = taskLifeCycle.completeTask("193", map);
+//		System.out.println(success);
 		
-		//JSONObject json = remoteRest.getProcessInstanceState("94");
+		//JSONObject json = remoteRest.getProcessInstanceState("130");
 		//---------------------------------------------------
 		//9.get global var
-		//JSONObject json = remoteRest.getProcessInstanceVar(processInstanceId);
+//		JSONObject json = variables.getProcessInstanceVar("130");
+//		System.out.println(json);
 		
 		//10.get local var
-		//JSONObject json = remoteRest.getTaskVar("63");
-		
+//		JSONObject json = variables.getTaskVar(deploymentId,"193");
+//		System.out.println(json);
 		
 		
 		

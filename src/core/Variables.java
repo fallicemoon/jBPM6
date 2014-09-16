@@ -34,8 +34,16 @@ public class Variables {
 		return responseJson;
 	}
 	
-	public JSONObject getTaskVar(String taskId) throws JSONException, IOException {
-		String url = String.format("%s/runtime/com.henry:henry_project:1.0/workitem/%s", baseURL, taskId);
+	/**
+	 * get task variables, but only 'Ready' and 'InProgress' status task (don't use this method to get status is 'Completed' task)
+	 * @param deploymentId
+	 * @param taskId
+	 * @return Task variables, TaskName, GroupId and NodeName.
+	 * @throws JSONException
+	 * @throws IOException
+	 */
+	public JSONObject getTaskVar(String deploymentId, String taskId) throws JSONException, IOException {
+		String url = String.format("%s/runtime/%s/workitem/%s", baseURL, deploymentId, taskId);
 		JSONObject json = new JSONObject(jbpmRestEntity.connect(url, "GET").readLine());
 		return json.getJSONObject("param-map");
 	}

@@ -21,9 +21,6 @@ public class Task {
 	
 
 
-
-	
-
 	public JSONObject getAllTasks() throws JSONException {
 		String url = String.format("%s/task/query", baseURL);
 		BufferedReader reader = jbpmRestEntity.connect(url, "GET");
