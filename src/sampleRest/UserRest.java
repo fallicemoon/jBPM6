@@ -37,7 +37,7 @@ public class UserRest extends Rest{
 	public UserRest(String usersPropertiesPath, String rolesPropertiesPath) {
 		this.usersPropertiesPath = usersPropertiesPath;
 		this.rolesPropertiesPath = rolesPropertiesPath;
-	} 
+	}
 	
 	//properties with I/O	
 	private Properties[] getProperties() throws IOException {

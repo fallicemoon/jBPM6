@@ -8,7 +8,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import core.JbpmRestEntity;
+import core.ProcessInstance;
 import core.Task;
+import core.TaskLifeCycle;
+import core.Variables;
 
 public class Test {
 
@@ -17,7 +20,14 @@ public class Test {
 	}
 	
 	public static void main(String[] args) throws IOException, JSONException, ScriptException {
+		
 		JbpmRestEntity jbpmRestEntity = new JbpmRestEntity();
+		
+		ProcessInstance processInstance = new ProcessInstance(jbpmRestEntity);
+		Task task = new Task(jbpmRestEntity);
+		TaskLifeCycle taskLifeCycle = new TaskLifeCycle(jbpmRestEntity);
+		Variables variables = new Variables(jbpmRestEntity);
+		
 		String deploymentId = "com.newegg.henry:henry_proj:1.0";
 		String processDefId = "henry_proj.take_off_request";
 		
@@ -30,7 +40,7 @@ public class Test {
 //		map.put("map_isAppro", 1);
 //		
 //		String processInstanceId = remoteRest.createProcessInstance(deploymentId, processDefId, map);
-		JSONObject json = remoteRest.getReadyTaskIdByProcessInstanceId("103");
+//		JSONObject json = remoteRest.getReadyTaskIdByProcessInstanceId("103");
 		
 		//remoteRest.startTask(json.getString("103"));
 		
@@ -75,7 +85,7 @@ public class Test {
 		//10.get local var
 		//JSONObject json = remoteRest.getTaskVar("63");
 		
-		System.out.println(json);
+		
 		
 		
 	}

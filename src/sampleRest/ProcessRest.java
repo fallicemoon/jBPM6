@@ -12,13 +12,24 @@ import org.jboss.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import core.JbpmRestEntity;
+import core.ProcessInstance;
 import core.Task;
+import core.TaskLifeCycle;
+import core.Variables;
 
 
 
 
 @Path("/process")
 public class ProcessRest extends Rest{
+	
+	JbpmRestEntity jbpmRestEntity = new JbpmRestEntity();
+	ProcessInstance processInstance = new ProcessInstance(jbpmRestEntity);
+	Task task = new Task(jbpmRestEntity);
+	TaskLifeCycle taskLifeCycle = new TaskLifeCycle(jbpmRestEntity);
+	Variables variables = new Variables(jbpmRestEntity);
+	
 
 	public ProcessRest() {
 		
@@ -39,8 +50,7 @@ public class ProcessRest extends Rest{
 			map.put("map_reason", reason);
 			map.put("map_days", days.toString());
 			
-			Task remoteRest = new Task();
-			String processInstanceId = remoteRest.createProcessInstance("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request", map);
+			String processInstanceId = taskLifeCycle.createProcessInstance("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request", map);
 			Map<String, Object> responseMap = new HashMap<String, Object>();
 			map.put("processInstanceId", processInstanceId.toString());
 			
@@ -59,7 +69,7 @@ public class ProcessRest extends Rest{
 	
 	@GET
 	public String getTaskOfLeaveList(String jsonString){
-		Task remoteRest = new Task();
+		Task remoteRest = new Task(jbpmRestEntity);
 		String taskName;
 		
 		try {
@@ -76,7 +86,7 @@ public class ProcessRest extends Rest{
 	
 	@GET
 	public String getLeave(String jsonString){
-		Task remoteRest = new Task();
+		Variables remoteRest = new Variables(jbpmRestEntity);
 		String processInstanceId;
 		
 		try {
@@ -96,7 +106,7 @@ public class ProcessRest extends Rest{
 	
 	@GET
 	public String getLeaveTask(String jsonString){
-		Task remoteRest = new Task();
+		Variables remoteRest = new Variables(jbpmRestEntity);
 		String processInstanceId;
 		
 		try {
@@ -118,7 +128,7 @@ public class ProcessRest extends Rest{
 	
 	@PUT
 	public String assignLeave(String jsonString){
-		Task remoteRest = new Task();
+		Task remoteRest = new Task(jbpmRestEntity);
 		String taskId;
 		
 		try {
@@ -135,7 +145,7 @@ public class ProcessRest extends Rest{
 	
 	@PUT
 	public String approveLeave(String jsonString){
-		Task remoteRest = new Task();
+		TaskLifeCycle remoteRest = new TaskLifeCycle(jbpmRestEntity);
 		String isApproved;
 		String taskId;
 		
