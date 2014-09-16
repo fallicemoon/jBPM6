@@ -1,4 +1,4 @@
-package rest;
+package sampleRest;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,7 +12,10 @@ import org.jboss.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import utility.RemoteRest;
+import core.Task;
+
+
+
 
 @Path("/process")
 public class ProcessRest extends Rest{
@@ -36,7 +39,7 @@ public class ProcessRest extends Rest{
 			map.put("map_reason", reason);
 			map.put("map_days", days.toString());
 			
-			RemoteRest remoteRest = new RemoteRest();
+			Task remoteRest = new Task();
 			String processInstanceId = remoteRest.createProcessInstance("com.newegg.henry:henry_proj:1.0", "henry_project.leave_request", map);
 			Map<String, Object> responseMap = new HashMap<String, Object>();
 			map.put("processInstanceId", processInstanceId.toString());
@@ -56,7 +59,7 @@ public class ProcessRest extends Rest{
 	
 	@GET
 	public String getTaskOfLeaveList(String jsonString){
-		RemoteRest remoteRest = new RemoteRest();
+		Task remoteRest = new Task();
 		String taskName;
 		
 		try {
@@ -73,7 +76,7 @@ public class ProcessRest extends Rest{
 	
 	@GET
 	public String getLeave(String jsonString){
-		RemoteRest remoteRest = new RemoteRest();
+		Task remoteRest = new Task();
 		String processInstanceId;
 		
 		try {
@@ -93,7 +96,7 @@ public class ProcessRest extends Rest{
 	
 	@GET
 	public String getLeaveTask(String jsonString){
-		RemoteRest remoteRest = new RemoteRest();
+		Task remoteRest = new Task();
 		String processInstanceId;
 		
 		try {
@@ -115,7 +118,7 @@ public class ProcessRest extends Rest{
 	
 	@PUT
 	public String assignLeave(String jsonString){
-		RemoteRest remoteRest = new RemoteRest();
+		Task remoteRest = new Task();
 		String taskId;
 		
 		try {
@@ -132,7 +135,7 @@ public class ProcessRest extends Rest{
 	
 	@PUT
 	public String approveLeave(String jsonString){
-		RemoteRest remoteRest = new RemoteRest();
+		Task remoteRest = new Task();
 		String isApproved;
 		String taskId;
 		

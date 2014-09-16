@@ -1,9 +1,10 @@
-package rest;
+package sampleRest;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,15 +23,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @Path("/user")
-public class User {
+public class UserRest extends Rest{
 	String usersPropertiesPath;
 	String rolesPropertiesPath;
+	
+	static int USERS_PROPERTIES_PATH = 0;
+	static int ROLES_PROPERTIES_PATH = 1;
 
-	public User() {
-		this("/home/el43/jbpm-installer/jboss-as-7.1.1.Final/standalone/configuration/users.properties", "/home/el43/jbpm-installer/jboss-as-7.1.1.Final/standalone/configuration/roles.properties");
+	public UserRest() {
+		this("/home/el43/jbpm-installer/wildfly-8.1.0.Final/standalone/configuration/users.properties", "/home/el43/jbpm-installer/wildfly-8.1.0.Final/standalone/configuration/roles.properties");
 	}
 	
-	public User(String usersPropertiesPath, String rolesPropertiesPath) {
+	public UserRest(String usersPropertiesPath, String rolesPropertiesPath) {
 		this.usersPropertiesPath = usersPropertiesPath;
 		this.rolesPropertiesPath = rolesPropertiesPath;
 	} 
@@ -57,42 +61,26 @@ public class User {
 		rolesProperties.store(rolesFos, null);
 	}
 	
-	private String getSuccessResponseJson(Map<String, Object> responseMap) {
-		JSONObject responseJsonObject = new JSONObject(responseMap);
-		try {
-			responseJsonObject.put("success", "true");
-			return responseJsonObject.toString();
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return "{\"success\":\"false\"}";
-		}
-		
-	}
-	
-	private String getFailResponseJson() {
-		JSONObject responseJsonObject = new JSONObject();
-		try {
-			responseJsonObject.put("success", "false");
-			return responseJsonObject.toString();
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return "{\"success\":\"false\"}";
-		}
-	}
 
-	
+
 	//REST
 	@GET
 	@Produces("application/json")
 	public String listUsers() {
 		try {
 			Properties[] properties = getProperties();
-			Properties usersProperties = properties[0];
-			Set<Object> users = usersProperties.keySet();
+			Properties rolesProperties = properties[ROLES_PROPERTIES_PATH];
+			
+			Set<Object> users = rolesProperties.keySet();			
 			Map<String, Object> responseMap = new HashMap<String, Object>();
-			responseMap.put("users", new JSONArray(users));
+			
+			for (Object object : users) {
+				String user = (String)object;
+				String rolesString = rolesProperties.getProperty(user);
+				String[] roles = rolesString.split(",");
+				
+				responseMap.put(user, roles);
+			}
 			
 			return getSuccessResponseJson(responseMap);
 			
@@ -126,14 +114,15 @@ public class User {
 		
 		try {
 			Properties[] properties = getProperties();
-			Properties usersProperties = properties[0];
-			Properties rolesProperties = properties[1];
+			Properties usersProperties = properties[USERS_PROPERTIES_PATH];
+			Properties rolesProperties = properties[ROLES_PROPERTIES_PATH];
 			
 			usersProperties.put(user, password);
-			String role = "admin";
+			String role = "";
 			for (String string : roles) {
 				role = role + "," + string;
 			}
+			role = role.substring(1);
 			rolesProperties.put(user, role);
 			
 			setProperties(usersProperties, rolesProperties);
@@ -152,8 +141,8 @@ public class User {
 	public String deleteUser(@PathParam("user") String user){
 		try {
 			Properties[] properties = getProperties();
-			Properties usersProperties = properties[0];
-			Properties rolesProperties = properties[1];
+			Properties usersProperties = properties[USERS_PROPERTIES_PATH];
+			Properties rolesProperties = properties[ROLES_PROPERTIES_PATH];
 			
 			usersProperties.remove(user);
 			rolesProperties.remove(user);

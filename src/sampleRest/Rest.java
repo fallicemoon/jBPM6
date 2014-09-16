@@ -1,4 +1,4 @@
-package rest;
+package sampleRest;
 
 import java.util.Map;
 
@@ -10,7 +10,10 @@ import org.jboss.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import utility.RemoteRest;
+import core.Task;
+
+
+
 
 @Path("/login")
 public class Rest {
