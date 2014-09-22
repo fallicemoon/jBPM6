@@ -8,6 +8,7 @@ import java.util.Set;
 
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,15 +33,22 @@ public class TaskLifeCycle {
 	 * @throws IOException
 	 * @throws JSONException
 	 */
-	public boolean startTask(String taskId) throws IOException, JSONException {
-		String url = String.format("%s/task/%s/start", baseURL, taskId);
+	public boolean startTask(JSONArray taskIds) throws IOException, JSONException {
+		JSONArray urls = new JSONArray();
+		
+		for (int i = 0; i < taskIds.length(); i++) {
+			String url = String.format("%s/task/%s/start", baseURL, taskIds.getString(i));
+			urls.put(url);
+		}
 		
 		try {
-			JSONObject responseJson = new JSONObject(jbpmRestEntity.connect(url, "POST").readLine());
-			if (responseJson.getString("status").equals("SUCCESS")) {
-				return true;
+			for (int i = 0; i < urls.length(); i++) {
+				JSONObject responseJson = new JSONObject(jbpmRestEntity.connect(urls.getString(i), "POST").readLine());
+				
+				if (!responseJson.getString("status").equals("SUCCESS"))
+					return false;
 			}
-			return false;
+			return true;
 			
 		} catch (Exception e) {
 			e.printStackTrace();

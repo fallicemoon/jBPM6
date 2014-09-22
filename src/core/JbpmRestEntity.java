@@ -14,12 +14,15 @@ public class JbpmRestEntity {
 	private String baseURL;
 	private String user;
 	private String password;
+	
+	public JbpmRestEntity () {
+		
+	}
 
-	public JbpmRestEntity() {
-		//TODO remove after test
-		setBaseURL("http://10.16.140.105:8080/jbpm-console/rest");
-		setUser("henry");
-		setPassword("123");
+	public JbpmRestEntity (String baseURL, String user, String password) {
+		this.baseURL = baseURL;
+		this.user = user;
+		this.password = password;
 	}
 	
 	

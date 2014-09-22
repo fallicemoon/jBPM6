@@ -43,7 +43,9 @@ public class Variables {
 	 * @throws IOException
 	 */
 	public JSONObject getTaskVar(String deploymentId, String taskId) throws JSONException, IOException {
-		String url = String.format("%s/runtime/%s/workitem/%s", baseURL, deploymentId, taskId);
+		Task task = new Task(jbpmRestEntity);
+		String workitemId = String.valueOf(task.getTask(taskId).getJSONObject("jaxbTaskData").getInt("work-item-id"));
+		String url = String.format("%s/runtime/%s/workitem/%s", baseURL, deploymentId, workitemId);
 		JSONObject json = new JSONObject(jbpmRestEntity.connect(url, "GET").readLine());
 		return json.getJSONObject("param-map");
 	}

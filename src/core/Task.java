@@ -62,6 +62,38 @@ public class Task {
 		return responseJson;
 	}
 	
+//	public JSONObject getAllTasksByVar(String deploymentId, String processDefId, String key, String value) throws JSONException, IOException{
+//		JSONObject json = getAllTasks();
+//		JSONObject tempJson = new JSONObject();
+//		JSONObject responseJson = new JSONObject();
+//		Variables variables = new Variables(jbpmRestEntity);
+//		
+//		for (int i = 1; i <= json.length(); i++) {
+//			String index = String.valueOf(i);
+//			if (!json.getJSONObject(index).getString("deployment-id").equals(deploymentId)){
+//				continue;
+//			}
+//			if (!json.getJSONObject(index).getString("process-id").equals(processDefId)){
+//				continue;
+//			}			
+//			tempJson.put(String.valueOf(tempJson.length()+1), json.getJSONObject(index));
+//			
+//		}
+//		System.out.println(tempJson);
+//		for (int i = 1; i <= tempJson.length(); i++) {
+//			String index = String.valueOf(i);
+//			String taskId = String.valueOf(tempJson.getJSONObject(index).getInt("id"));
+//
+//			String var = String.valueOf(variables.getTaskVar(deploymentId, taskId).get(key));
+//			if (var.equals(value)) {
+//				responseJson.put(String.valueOf(responseJson.length()+1), tempJson.getJSONObject(index));
+//			}
+//				
+//		}
+//		
+//		return responseJson;
+//	}
+	
 	public JSONObject getAllTasksByTaskName(String deploymentId, String processDefId, String taskName) throws JSONException{
 		JSONObject json = getAllTasks();
 		JSONObject responseJson = new JSONObject();
@@ -129,18 +161,21 @@ public class Task {
 		return responseJson;
 	}
 	
-	public JSONObject getReadyTaskIdByProcessInstanceId(String processInstanceId) throws IOException, JSONException {
+	public JSONObject getReadyTaskIdsByProcessInstanceId(String processInstanceId) throws IOException, JSONException {
 		JSONObject json = getAllTasks();
 		JSONObject responseJson = new JSONObject();
+		JSONArray taskIds = new JSONArray();
 		
 		for(int i=1; i<=json.length(); i++){
 			JSONObject object = json.getJSONObject(String.valueOf(i));
 			String procInstId = String.valueOf(object.getInt("process-instance-id"));
-
+			
 			if(procInstId.equals(processInstanceId)&&object.getString("status").equals(TaskStatus.Ready.toString()))
-				responseJson.put(procInstId,String.valueOf(object.getInt("id")));
+				taskIds.put(String.valueOf(object.getInt("id")));
+		
 		}
 		
+		responseJson.put(processInstanceId,taskIds);
 		return responseJson;
 	}
 	
@@ -157,6 +192,22 @@ public class Task {
 		}
 		
 		return responseJson;
+	}
+	
+	public JSONObject getTask(String taskId) throws JSONException {
+		String url = String.format("%s/task/%s", baseURL, taskId);
+		BufferedReader reader = jbpmRestEntity.connect(url, "GET");
+		JSONObject json;
+		try {
+			json = new JSONObject(reader.readLine().toString());
+		} catch (IOException e) {
+			json = new JSONObject();
+			System.out.println("BufferReader has error......");
+			json.put("success", "false");
+			e.printStackTrace();
+		}
+		
+		return json;
 	}
 	
 
