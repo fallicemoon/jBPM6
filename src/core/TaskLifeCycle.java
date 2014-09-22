@@ -56,6 +56,21 @@ public class TaskLifeCycle {
 		}
 	}
 	
+	public boolean startTask(String taskId) throws IOException, JSONException {
+		String url = String.format("%s/task/%s/start", baseURL, taskId);
+		try {
+			JSONObject responseJson = new JSONObject(jbpmRestEntity.connect(url, "POST").readLine());
+			if (responseJson.getString("status").equals("SUCCESS")) {
+				return true;
+			}
+			
+			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	
 	/**
 	 * 
@@ -83,7 +98,7 @@ public class TaskLifeCycle {
 			}
 		}
 		
-		String query = queryMap.toString().replaceAll(", ", "&").replaceAll("[{}]", "");
+		String query = queryMap.toString().replaceAll(", ", "&").replaceAll("[{}]", "").replace("&", "&map_").replace("?", "?map_");
 		String url = String.format("%s/task/%s/complete?%s", baseURL, taskId, query);
 		
 		try {

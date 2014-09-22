@@ -45,7 +45,7 @@ public class ProcessInstance {
 			}
 		}
 		
-		String queryString = queryMap.toString().replaceAll(", ", "&").replaceAll("[{}]", "");
+		String queryString = queryMap.toString().replaceAll(", ", "&").replaceAll("[{}]", "").replace("&", "&map_").replace("?", "?map_");
 
         ScriptEngineManager factory = new ScriptEngineManager();
         ScriptEngine engine = factory.getEngineByName("JavaScript");
@@ -110,5 +110,6 @@ public class ProcessInstance {
 		return responseJson;
 	}
 	
+
 
 }
