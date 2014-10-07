@@ -45,7 +45,9 @@ public class ProcessInstance {
 			}
 		}
 		
-		String queryString = queryMap.toString().replaceAll(", ", "&").replaceAll("[{}]", "").replace("&", "&map_").replace("?", "?map_");
+		String queryString = queryMap.toString().replaceAll(", ", "&map_").replaceAll("[{}]", "");
+		queryString = "map_".concat(queryString);
+		System.out.println(queryString);
 
         ScriptEngineManager factory = new ScriptEngineManager();
         ScriptEngine engine = factory.getEngineByName("JavaScript");
@@ -64,6 +66,21 @@ public class ProcessInstance {
 	
 	
 	//--------------
+	public JSONObject getProcessInstance(String procDefId) throws JSONException, IOException {
+		String url = String.format("%s/history/process/%s", baseURL, procDefId);
+		JSONObject json = new JSONObject(jbpmRestEntity.connect(url, "GET").readLine());
+		JSONObject responseJson = new JSONObject();
+		
+		JSONArray historyLogList = json.getJSONArray("historyLogList");
+		
+		for (int i = 1; i < historyLogList.length(); i++) {
+			JSONObject j = historyLogList.getJSONObject(i).getJSONObject("process-instance-log");
+			responseJson.put(String.valueOf(i), j);
+		}
+		
+		return responseJson;
+	}
+	
 	public JSONObject getProcessInstanceByCreator(String creator) throws JSONException, IOException {
 		String url = String.format("%s/history/instances", baseURL);
 		JSONObject json = new JSONObject(jbpmRestEntity.connect(url, "GET").readLine());
@@ -110,6 +127,28 @@ public class ProcessInstance {
 		return responseJson;
 	}
 	
+	public JSONObject getProcessInstanceByVarId(String varId, String value) throws JSONException {
+		String url = String.format("%s/history/variable/%s/value/%s", baseURL, varId, value);
+		BufferedReader reader = jbpmRestEntity.connect(url, "GET");
+		JSONObject json;
+		JSONObject responseJson = new JSONObject();
+		try {
+			json = new JSONObject(reader.readLine().toString());
+			JSONArray array = json.getJSONArray("historyLogList");
+			for (int i = 0; i < array.length(); i++) {
+				JSONObject j = array.getJSONObject(i).getJSONObject("variable-instance-log");
+				responseJson.put(String.valueOf(i+1), j);
+			}
+			
+		} catch (IOException e) {
+			json = new JSONObject();
+			System.out.println("BufferReader has error......");
+			json.put("success", "false");
+			e.printStackTrace();
+		}
+		
+		return responseJson;
+	}
 
 
 }

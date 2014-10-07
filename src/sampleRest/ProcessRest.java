@@ -57,12 +57,12 @@ public class ProcessRest extends Rest{
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 			
 		} catch (IOException e) {
 			logger.info("http return BufferReader has some problem......");
 			e.printStackTrace();
-			return getFailResponseJson();	
+			return getFailResponseJson("xxx");	
 		}				
 	}
 	
@@ -78,7 +78,7 @@ public class ProcessRest extends Rest{
 			return responseJson.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		} 
 		
 	}
@@ -95,10 +95,10 @@ public class ProcessRest extends Rest{
 			return responseJson.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		} catch (IOException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		} 
 		
 	}
@@ -115,10 +115,10 @@ public class ProcessRest extends Rest{
 			return responseJson.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		} catch (IOException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		} 
 		
 	}
@@ -137,7 +137,7 @@ public class ProcessRest extends Rest{
 			return responseJson.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		} 
 		
 	}
@@ -160,10 +160,10 @@ public class ProcessRest extends Rest{
 			return getSuccessResponseJson(new HashMap<String, Object>());
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		} catch (IOException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		}
 		
 	}

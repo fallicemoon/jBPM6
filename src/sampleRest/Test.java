@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.enterprise.inject.New;
 import javax.script.ScriptException;
 
 import org.json.JSONException;
@@ -24,7 +25,7 @@ public class Test {
 	
 	public static void main(String[] args) throws IOException, JSONException, ScriptException {
 		
-		JbpmRestEntity jbpmRestEntity = new JbpmRestEntity("http://10.16.140.105:8080/jbpm-console/rest","henry","123");
+		JbpmRestEntity jbpmRestEntity = new JbpmRestEntity("http://10.16.140.105:8080/jbpm-console/rest","henry_manager","123");
 		
 		ProcessInstance processInstance = new ProcessInstance(jbpmRestEntity);
 		Task task = new Task(jbpmRestEntity);
@@ -36,17 +37,23 @@ public class Test {
 		
 		
 		//1.user side, create process
-		//jbpmRestEntity.setUser("henry");
+
 //		Map<String, Object> map = new HashMap<String, Object>();
-//		map.put("map_reasons","i am sick");
-//		map.put("map_day", 3);
-//		map.put("map_isAppro", 1);
+//		map.put("reasons","i");
+//		map.put("day", 3);
+//		map.put("isAppro", 1);
+//		
+//		JSONObject json1 = new JSONObject();
+//		for (int i = 0; i < 100; i++) {
+//			json1.put(String.valueOf(i), "abcdes");
+//		}
+//		map.put("jsonObj", json1.toString());
 //		
 //		String processInstanceId = processInstance.createProcessInstance(deploymentId, processDefId, map);
 //		JSONObject json = task.getReadyTaskIdsByProcessInstanceId(processInstanceId);
 //		System.out.println(json);
-		
-//		jbpmRestEntity.setUser("henry_manager");
+//		
+//
 //		boolean success = taskLifeCycle.startTask(json.getJSONArray(processInstanceId));
 //		System.out.println(success);
 		
@@ -103,10 +110,11 @@ public class Test {
 //		JSONObject tasks = task.getAllTasksByTaskName(deploymentId, processDefId, "manager_approve", TaskStatus.InProgress);
 //		System.out.println(tasks);
 		
-		System.out.println(task.getReadyTaskIdsByProcessInstanceId("225"));
-		System.out.println(task.getTask("380"));
 		
+		//System.out.println(taskLifeCycle.delegateTask(taskId, targetId));
+		//taskLifeCycle.delegateTask("581", "henry_manager");
+
+		System.out.println(processInstance.getProcessInstanceByVarId("id","a1s2"));
 	}
-
-
+	
 }

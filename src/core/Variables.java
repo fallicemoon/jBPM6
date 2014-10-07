@@ -1,5 +1,6 @@
 package core;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.json.JSONArray;
@@ -32,6 +33,22 @@ public class Variables {
 		}
 		
 		return responseJson;
+	}
+	
+	public JSONObject getProcessInstanceVar(String processInstanceId, String varId) throws JSONException {
+		String url = String.format("%s/history/instance/%s/variable/ReqType", baseURL, processInstanceId, varId);
+		BufferedReader reader = jbpmRestEntity.connect(url, "GET");
+		JSONObject json;
+		try {
+			json = new JSONObject(reader.readLine().toString());
+		} catch (IOException e) {
+			json = new JSONObject();
+			System.out.println("BufferReader has error......");
+			json.put("success", "false");
+			e.printStackTrace();
+		}
+		
+		return json;
 	}
 	
 	/**

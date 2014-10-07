@@ -98,8 +98,10 @@ public class TaskLifeCycle {
 			}
 		}
 		
-		String query = queryMap.toString().replaceAll(", ", "&").replaceAll("[{}]", "").replace("&", "&map_").replace("?", "?map_");
-		String url = String.format("%s/task/%s/complete?%s", baseURL, taskId, query);
+		String queryString = queryMap.toString().replaceAll(", ", "&map_").replaceAll("[{}]", "");
+		queryString = "map_".concat(queryString);
+		
+		String url = String.format("%s/task/%s/complete?%s", baseURL, taskId, queryString);
 		
 		try {
 			JSONObject responseJson = new JSONObject(jbpmRestEntity.connect(url, "POST").readLine());
@@ -130,6 +132,33 @@ public class TaskLifeCycle {
 			return false;
 		}
 	}
+	
+	public JSONObject stopTask(String taskId) throws JSONException, IOException {
+		String url = String.format("%s/task/%s/stop", baseURL, taskId);
+		JSONObject responseJson = new JSONObject(jbpmRestEntity.connect(url, "POST").readLine());
+		return responseJson;
+	}
+	
+	/**
+	 * InProgress to Reserved, need to startTask() again.
+	 * @param taskId
+	 * @param targetId 
+	 * @return
+	 * @throws JSONException
+	 * @throws IOException
+	 */
+	public boolean delegateTask(String taskId, String targetId) throws JSONException, IOException {
+		String url = String.format("%s/task/%s/delegate?targetEntityId=%s", baseURL, taskId, targetId);
+		JSONObject responseJson = new JSONObject(jbpmRestEntity.connect(url, "POST").readLine());
+		
+		if (!responseJson.getString("status").equals("SUCCESS"))
+			return false;
+		
+		return true;
+	}
+	
+
+	
 	
 
 

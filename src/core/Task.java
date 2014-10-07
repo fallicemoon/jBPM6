@@ -210,6 +210,23 @@ public class Task {
 		return json;
 	}
 	
+	
+	public JSONObject test(String taskId, String value) throws JSONException {
+		String url = String.format("%s/runtime/%s/history/variable/%s/instances", baseURL, taskId);
+		BufferedReader reader = jbpmRestEntity.connect(url, "GET");
+		JSONObject json;
+		try {
+			json = new JSONObject(reader.readLine().toString());
+		} catch (IOException e) {
+			json = new JSONObject();
+			System.out.println("BufferReader has error......");
+			json.put("success", "false");
+			e.printStackTrace();
+		}
+		
+		return json;
+	}
+	
 
 
 }

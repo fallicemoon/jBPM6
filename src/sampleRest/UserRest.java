@@ -85,7 +85,7 @@ public class UserRest extends Rest{
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		}
 	}
 	
@@ -108,7 +108,7 @@ public class UserRest extends Rest{
 			
 		} catch (JSONException e1) {
 			e1.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		}
 		
 		try {
@@ -130,7 +130,7 @@ public class UserRest extends Rest{
 			
 		} catch (IOException e){
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		}
 	}
 	
@@ -151,7 +151,7 @@ public class UserRest extends Rest{
 			
 		} catch (IOException e){
 			e.printStackTrace();
-			return getFailResponseJson();
+			return getFailResponseJson("xxx");
 		}
 	}
 
