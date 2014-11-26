@@ -57,31 +57,31 @@ public class ProcessRest extends Rest{
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return getFailResponseJson("xxx");
+			return getFailResponseJson("JSONException");
 			
 		} catch (IOException e) {
 			logger.info("http return BufferReader has some problem......");
 			e.printStackTrace();
-			return getFailResponseJson("xxx");	
+			return getFailResponseJson("IOException");
 		}				
 	}
 	
-	@GET
-	public String getTaskOfLeaveList(String jsonString){
-		Task remoteRest = new Task(jbpmRestEntity);
-		String taskName;
-		
-		try {
-			JSONObject json = new JSONObject(jsonString);
-			taskName = json.getString("taskName");
-			JSONObject responseJson = remoteRest.getAllTasksByTaskName("com.henry:henry_proj:1.0", "henry_project.leave_request",taskName);
-			return responseJson.toString();
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return getFailResponseJson("xxx");
-		} 
-		
-	}
+//	@GET
+//	public String getTaskOfLeaveList(String jsonString){
+//		Task remoteRest = new Task(jbpmRestEntity);
+//		String taskName;
+//		
+//		try {
+//			JSONObject json = new JSONObject(jsonString);
+//			taskName = json.getString("taskName");
+//			JSONObject responseJson = remoteRest.getAllTasksByTaskName("com.henry:henry_proj:1.0", "henry_project.leave_request",taskName);
+//			return responseJson.toString();
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//			return getFailResponseJson("xxx");
+//		} 
+//		
+//	}
 	
 	@GET
 	public String getLeave(String jsonString){
@@ -125,22 +125,22 @@ public class ProcessRest extends Rest{
 	
 	
 	
-	@PUT
-	public String assignLeave(String jsonString){
-		Task remoteRest = new Task(jbpmRestEntity);
-		String taskId;
-		
-		try {
-			JSONObject json = new JSONObject(jsonString);
-			taskId = json.getString("taskId");
-			JSONObject responseJson = remoteRest.getAllTasksByTaskName("com.henry:henry_project:1.0", "henry_project.leave_request",taskId);
-			return responseJson.toString();
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return getFailResponseJson("xxx");
-		} 
-		
-	}
+//	@PUT
+//	public String assignLeave(String jsonString){
+//		Task remoteRest = new Task(jbpmRestEntity);
+//		String taskId;
+//		
+//		try {
+//			JSONObject json = new JSONObject(jsonString);
+//			taskId = json.getString("taskId");
+//			JSONObject responseJson = remoteRest.getAllTasksByTaskName("com.henry:henry_project:1.0", "henry_project.leave_request",taskId);
+//			return responseJson.toString();
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//			return getFailResponseJson("xxx");
+//		} 
+//		
+//	}
 	
 	@PUT
 	public String approveLeave(String jsonString){

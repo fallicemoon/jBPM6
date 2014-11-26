@@ -7,6 +7,10 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.commons.codec.binary.Base64;
 
 public class JbpmRestEntity {	
@@ -56,6 +60,15 @@ public class JbpmRestEntity {
 		HttpURLConnection con;
 		BufferedReader reader = new BufferedReader(new StringReader("remote return fail"));
 		try {
+	        ScriptEngineManager factory = new ScriptEngineManager();
+	        ScriptEngine engine = factory.getEngineByName("JavaScript");
+	        try {
+				url = (String)engine.eval("encodeURI('"+url+"')");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        
 			con = (HttpURLConnection)new URL(url).openConnection();
 			con.setRequestMethod(method);
 			String authHeader = Base64.encodeBase64String(

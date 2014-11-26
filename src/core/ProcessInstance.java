@@ -48,12 +48,10 @@ public class ProcessInstance {
 		String queryString = queryMap.toString().replaceAll(", ", "&map_").replaceAll("[{}]", "");
 		queryString = "map_".concat(queryString);
 		System.out.println(queryString);
+		
 
-        ScriptEngineManager factory = new ScriptEngineManager();
-        ScriptEngine engine = factory.getEngineByName("JavaScript");
-        String query = (String)engine.eval("encodeURI('"+queryString+"')");
 
-		String url = String.format("%s/runtime/%s/process/%s/start?%s", baseURL, deploymentId, processDefId, query);
+		String url = String.format("%s/runtime/%s/process/%s/start?%s", baseURL, deploymentId, processDefId, queryString);
 		BufferedReader reader = jbpmRestEntity.connect(url, "POST");
 		JSONObject json = new JSONObject(reader.readLine().toString());
 		return String.valueOf(json.getInt("id"));

@@ -44,23 +44,53 @@ public class Task {
 		return responseJson;
 	}
 	
-	public JSONObject getAllTasks(String deploymentId, String processDefId) throws JSONException{
-		JSONObject json = getAllTasks();
-		JSONObject responseJson = new JSONObject();
+	public JSONObject getAllTasks(String ...querys) throws JSONException {
+		String url = null;
+		for (int i = 0; i < querys.length; i++) {
+			String query = querys[i];
+			url = String.format("%s/task/query?"+query, baseURL);
+			if (i == querys.length-1) break;
+			url = url+"&";
+		}
 		
-		for (int i = 1; i <= json.length(); i++) {
-			String index = String.valueOf(i);
-			if (!json.getJSONObject(index).getString("deployment-id").equals(deploymentId)){
-				continue;
-			}
-			if (!json.getJSONObject(index).getString("process-id").equals(processDefId)){
-				continue;
-			}
-			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+		BufferedReader reader = jbpmRestEntity.connect(url, "GET");
+		JSONObject json;
+		try {
+			json = new JSONObject(reader.readLine().toString());
+		} catch (IOException e) {
+			json = new JSONObject();
+			System.out.println("BufferReader has error......");
+			json.put("success", "false");
+			e.printStackTrace();
+		}
+		
+		JSONObject responseJson = new JSONObject();
+		JSONArray taskSummaryList = json.getJSONArray("taskSummaryList");
+		for (int i = 0; i < taskSummaryList.length(); i++) {
+			JSONObject j = taskSummaryList.getJSONObject(i).getJSONObject("task-summary");
+			responseJson.put(String.valueOf(i+1), j);
 		}
 		
 		return responseJson;
 	}
+	
+//	public JSONObject getAllTasks(String deploymentId, String processDefId) throws JSONException{
+//		JSONObject json = getAllTasks();
+//		JSONObject responseJson = new JSONObject();
+//		
+//		for (int i = 1; i <= json.length(); i++) {
+//			String index = String.valueOf(i);
+//			if (!json.getJSONObject(index).getString("deployment-id").equals(deploymentId)){
+//				continue;
+//			}
+//			if (!json.getJSONObject(index).getString("process-id").equals(processDefId)){
+//				continue;
+//			}
+//			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+//		}
+//		
+//		return responseJson;
+//	}
 	
 //	public JSONObject getAllTasksByVar(String deploymentId, String processDefId, String key, String value) throws JSONException, IOException{
 //		JSONObject json = getAllTasks();
@@ -94,104 +124,108 @@ public class Task {
 //		return responseJson;
 //	}
 	
-	public JSONObject getAllTasksByTaskName(String deploymentId, String processDefId, String taskName) throws JSONException{
-		JSONObject json = getAllTasks();
-		JSONObject responseJson = new JSONObject();
-		
-		for (int i = 1; i <= json.length(); i++) {
-			String index = String.valueOf(i);
-			if (!json.getJSONObject(index).getString("name").equals(taskName))
-				continue;
+//	public JSONObject getAllTasksByTaskName(String deploymentId, String processDefId, String taskName) throws JSONException{
+//		JSONObject json = getAllTasks();
+//		JSONObject responseJson = new JSONObject();
+//		
+//		for (int i = 1; i <= json.length(); i++) {
+//			String index = String.valueOf(i);
+//			if (!json.getJSONObject(index).getString("name").equals(taskName))
+//				continue;
+//	
+//			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+//		}
+//		
+//		return responseJson;
+//	}
 	
-			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
-		}
-		
-		return responseJson;
-	}
+//	public JSONObject getAllTasksByTaskName(String deploymentId, String processDefId, String taskName, TaskStatus status) throws JSONException{
+//		JSONObject json = getAllTasksByTaskName(deploymentId, processDefId, taskName);
+//		JSONObject responseJson = new JSONObject();
+//		
+//		for (int i = 1; i <= json.length(); i++) {
+//			String index = String.valueOf(i);
+//			if (!json.getJSONObject(index).getString("status").equals(status.toString()))
+//				continue;
+//	
+//			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+//		}
+//		
+//		return responseJson;
+//	}
 	
-	public JSONObject getAllTasksByTaskName(String deploymentId, String processDefId, String taskName, TaskStatus status) throws JSONException{
-		JSONObject json = getAllTasksByTaskName(deploymentId, processDefId, taskName);
-		JSONObject responseJson = new JSONObject();
-		
-		for (int i = 1; i <= json.length(); i++) {
-			String index = String.valueOf(i);
-			if (!json.getJSONObject(index).getString("status").equals(status.toString()))
-				continue;
+//	public JSONObject getAllTasksByApprover(String deploymentId, String processDefId, String approver) throws JSONException{
+//		JSONObject json = getAllTasks();
+//		JSONObject responseJson = new JSONObject();
+//		
+//		for (int i = 1; i <= json.length(); i++) {
+//			String index = String.valueOf(i);
+//			String actualOwner;
+//			try {
+//				actualOwner = json.getJSONObject(index).getString("actual-owner");
+//			} catch (JSONException e) {
+//				actualOwner = "";
+//			}
+//
+//			if (!approver.equals(actualOwner))
+//				continue;
+//
+//			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+//		}
+//		
+//		return responseJson;
+//	}
+//	
+//	public JSONObject getAllTasksByApprover(String deploymentId, String processDefId, String approver, TaskStatus status) throws JSONException{
+//		JSONObject json = getAllTasksByTaskName(deploymentId, processDefId, approver);
+//		JSONObject responseJson = new JSONObject();
+//		
+//		for (int i = 1; i <= json.length(); i++) {
+//			String index = String.valueOf(i);
+//			if (!json.getJSONObject(index).getString("status").equals(status.toString()))
+//				continue;
+//	
+//			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
+//		}
+//		
+//		return responseJson;
+//	}
 	
-			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
-		}
-		
-		return responseJson;
-	}
-	
-	public JSONObject getAllTasksByApprover(String deploymentId, String processDefId, String approver) throws JSONException{
-		JSONObject json = getAllTasks();
-		JSONObject responseJson = new JSONObject();
-		
-		for (int i = 1; i <= json.length(); i++) {
-			String index = String.valueOf(i);
-			String actualOwner;
-			try {
-				actualOwner = json.getJSONObject(index).getString("actual-owner");
-			} catch (JSONException e) {
-				actualOwner = "";
-			}
-
-			if (!approver.equals(actualOwner))
-				continue;
-
-			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
-		}
-		
-		return responseJson;
-	}
-	
-	public JSONObject getAllTasksByApprover(String deploymentId, String processDefId, String approver, TaskStatus status) throws JSONException{
-		JSONObject json = getAllTasksByTaskName(deploymentId, processDefId, approver);
-		JSONObject responseJson = new JSONObject();
-		
-		for (int i = 1; i <= json.length(); i++) {
-			String index = String.valueOf(i);
-			if (!json.getJSONObject(index).getString("status").equals(status.toString()))
-				continue;
-	
-			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
-		}
-		
-		return responseJson;
-	}
-	
-	public JSONObject getReadyTaskIdsByProcessInstanceId(String processInstanceId) throws IOException, JSONException {
-		JSONObject json = getAllTasks();
-		JSONObject responseJson = new JSONObject();
+	public JSONArray getTaskIdsByProcessInstanceId(String processInstanceId) throws IOException, JSONException {
+		JSONObject json = getAllTasks("processInstanceId="+processInstanceId);
 		JSONArray taskIds = new JSONArray();
 		
 		for(int i=1; i<=json.length(); i++){
 			JSONObject object = json.getJSONObject(String.valueOf(i));
 			String procInstId = String.valueOf(object.getInt("process-instance-id"));
 			
-			if(procInstId.equals(processInstanceId)&&object.getString("status").equals(TaskStatus.Ready.toString()))
+			if(procInstId.equals(processInstanceId))
 				taskIds.put(String.valueOf(object.getInt("id")));
 		
 		}
 		
-		responseJson.put(processInstanceId,taskIds);
-		return responseJson;
+		return taskIds;
+	}
+	
+	public JSONArray getTaskIdsByProcessInstanceId(String processInstanceId, TaskStatus taskStatus) throws IOException, JSONException {
+		JSONObject json = getAllTasks("processInstanceId="+processInstanceId);
+		JSONArray taskIds = new JSONArray();
+		
+		for(int i=1; i<=json.length(); i++){
+			JSONObject object = json.getJSONObject(String.valueOf(i));
+			String procInstId = String.valueOf(object.getInt("process-instance-id"));
+			
+			if(procInstId.equals(processInstanceId)&&object.getString("status").equals(taskStatus.toString()))
+				taskIds.put(String.valueOf(object.getInt("id")));
+		
+		}
+		
+		return taskIds;
 	}
 	
 	public JSONObject getTasksByProcessInstanceId(String processInstanceId) throws JSONException, IOException {
-		JSONObject json = getAllTasks();
-		JSONObject responseJson = new JSONObject();
-		
-		for (int i = 1; i <= json.length(); i++) {
-			String index = String.valueOf(i);
-			if (!String.valueOf(json.getJSONObject(index).getInt("process-instance-id")).equals(processInstanceId))
-				continue;
-	
-			responseJson.put(String.valueOf(responseJson.length()+1), json.getJSONObject(index));
-		}
-		
-		return responseJson;
+		JSONObject json = getAllTasks("processInstanceId="+processInstanceId);
+		return json;
 	}
 	
 	public JSONObject getTask(String taskId) throws JSONException {
@@ -211,19 +245,11 @@ public class Task {
 	}
 	
 	
-	public JSONObject test(String taskId, String value) throws JSONException {
-		String url = String.format("%s/runtime/%s/history/variable/%s/instances", baseURL, taskId);
-		BufferedReader reader = jbpmRestEntity.connect(url, "GET");
-		JSONObject json;
-		try {
-			json = new JSONObject(reader.readLine().toString());
-		} catch (IOException e) {
-			json = new JSONObject();
-			System.out.println("BufferReader has error......");
-			json.put("success", "false");
-			e.printStackTrace();
-		}
-		
+	public JSONObject test() throws JSONException, IOException {
+		String url = String.format("%s/runtime/%s/process/%s/start", baseURL, "com.newegg.fixedAssets:fixedAssets:1.0", "fixedAssets.three_one");
+		BufferedReader reader = jbpmRestEntity.connect(url, "POST");
+		JSONObject json = new JSONObject(reader.readLine().toString());
+
 		return json;
 	}
 	

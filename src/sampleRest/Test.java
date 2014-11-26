@@ -3,6 +3,7 @@ package sampleRest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.enterprise.inject.New;
 import javax.script.ScriptException;
@@ -25,15 +26,15 @@ public class Test {
 	
 	public static void main(String[] args) throws IOException, JSONException, ScriptException {
 		
-		JbpmRestEntity jbpmRestEntity = new JbpmRestEntity("http://10.16.140.105:8080/jbpm-console/rest","henry_manager","123");
+		JbpmRestEntity jbpmRestEntity = new JbpmRestEntity("http://10.16.140.105:8080/jbpm-console/rest","henry_fixedAssets","123");
 		
 		ProcessInstance processInstance = new ProcessInstance(jbpmRestEntity);
 		Task task = new Task(jbpmRestEntity);
 		TaskLifeCycle taskLifeCycle = new TaskLifeCycle(jbpmRestEntity);
 		Variables variables = new Variables(jbpmRestEntity);
 		
-		String deploymentId = "com.newegg.henry:henry_proj:1.0";
-		String processDefId = "henry_proj.leave_request";
+		String deploymentId = "com.newegg.fixedAssets:fixedAssets:1.0";
+		String processDefId = "fixedAssets.three_one";
 		
 		
 		//1.user side, create process
@@ -114,7 +115,10 @@ public class Test {
 		//System.out.println(taskLifeCycle.delegateTask(taskId, targetId));
 		//taskLifeCycle.delegateTask("581", "henry_manager");
 
-		System.out.println(processInstance.getProcessInstanceByVarId("id","a1s2"));
+		
+		System.out.println(variables.getProcessInstanceVar("661"));
+		
+
 	}
 	
 }

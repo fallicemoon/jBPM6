@@ -105,6 +105,7 @@ public class TaskLifeCycle {
 		
 		try {
 			JSONObject responseJson = new JSONObject(jbpmRestEntity.connect(url, "POST").readLine());
+			System.out.println("XXX"+responseJson);
 			if (responseJson.getString("status").equals("SUCCESS")) {
 				return true;
 			}
